@@ -1,0 +1,36 @@
+/* 
+Write a program that reads multiple messages from the keyboard and stores them in an array of pointers to strings. Then display the messages.
+-------------------------------------------------------------------------------*/
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_MSGS 5
+#define MAX_LENGTH 100
+
+int main() {
+    char* messages[MAX_MSGS]; // Tablou de pointeri spre șiruri de caractere
+
+    printf("Introduceti %d mesaje:\n", MAX_MSGS);
+    for (int i = 0; i < MAX_MSGS; i++) {
+        messages[i] = (char*)malloc(MAX_LENGTH * sizeof(char));
+        if (messages[i] == NULL) {
+            fprintf(stderr, "Eroare la alocarea memoriei.\n");
+            // Eliberează memoria alocată până în acest punct
+            for (int j = 0; j < i; j++) {
+                free(messages[j]);
+            }
+            return 1;
+        }
+        printf("Mesajul %d: ", i + 1);
+        fgets(messages[i], MAX_LENGTH, stdin);
+    }
+
+    printf("\nMesajele introduse sunt:\n");
+    for (int i = 0; i < MAX_MSGS; i++) {
+        printf("Mesajul %d: %s\n", i + 1, messages[i]);
+        free(messages[i]); // Eliberează memoria după afișare
+    }
+
+    return 0;
+}
