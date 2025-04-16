@@ -1,0 +1,64 @@
+/*
+Generate a file with random integer numbers (maximum values for numbers <=200), using the rand() and srand() functions. Use a function with arguments, the file name and the number of items, 
+arguments taken from the command line. Then read the contents of the file and display it on the screen. Also check the existence of a number l entered from the keyboard in the file by displaying an appropriate message.
+*/
+
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+// Acest cod se ruleaza din CMD unde trebuie sa introduci toata secventa de mai jos
+//  ||"C:\Users\andre\source\repos\Exerciti pregatitoare C\Debug\Exerciti pregatitoare C.exe"||   ||"D:\PregatireExamenC\GenerareNumere.txt"|| 10 1
+// Prima adresa difera la fiecare utilizator, vezi sa ai doar codul acesta necomentat si apasa F5, de acolo copiezi de la Utilizare: ------ [cale_si_nume.txt]
+// Pentru a doua adresa recomand in partitia D:\ sa creezi un fisier nou, il numesti cum vrei tu si copiezi adresa
+// Avand adresa programului si adreasa fisierului despartite de un spatiu va mai trebuila final sa scri cate numere vrei sa generezi random (ex:10) si ce numar vrei sa verifici daca exista in lista (ex:1)
+
+
+int main(int argc, char *argv[]) {
+
+    // afisarea adresei programului
+    if (argc != 4) { // 4 reprezinta parametri introdusi din CMD
+        printf("Utilizare: %s [cale_si_nume.txt]\n", argv[0]);
+        return 1;
+    }
+
+    FILE* fp = fopen(argv[1], "w"); // creare de pointer catre un fisier care este creat automat
+    if (fp == NULL) {
+        printf("Nu am putut crea fișierul %s\n", argv[1]);
+        return 2;
+    }
+    // inregistrarea valorilor introduse din CMD
+    int n = atoi(argv[2]);
+    int k = atoi(argv[3]);
+    printf("k = %d\n\n", k);
+    int i;
+
+    srand(time(NULL));
+
+    for (i = 0; i < n; i++) {
+        fprintf(fp, "%d ", rand() % 200 + 1); // scrierea in fisier a numerelor generate random 
+    }
+    fclose(fp);
+
+    fp = fopen(argv[1], "r"); // deschidere fisier in modul de citire
+    if (fp == NULL) {
+        printf("Nu am putut deschide fișierul %s pentru citire\n", argv[1]);
+        return 3;
+    }
+
+
+    //Verificare daca numarul K este in lista generata si afisarea pozitiei
+    for (i = 0; i < n; i++) {
+        int x;
+        fscanf(fp, "%d", &x);
+        // Daca vrei sa afisezi toate elementele din lista decomenteaza linia de mai jos
+        //printf(" %d \n", x);
+        if (k == x) {
+            printf("\t\n    Numarul K=%d introdus de la tastatura se afla in sirul generat random si se afla pe pozitia %d !\n", k, i + 1);
+            printf("\n");
+        }
+    }
+
+    return 0;
+}
