@@ -1,0 +1,152 @@
+/*
+Define the class Dreptunghi with attributes representing its sides and specific methods, including the method area().
+The application has a GUI using a Frame that includes a TextField, two buttons (Draw and Sort), a Canvas, and a Label.
+The TextField only accepts two integer values separated by space. If the input does not contain exactly two integers, an exception is thrown and an appropriate error message is shown in the label.
+
+When the Draw button is pressed:
+
+If no exception occurs and the dimensions do not exceed the size of the canvas, a rectangle is drawn at a random position that fits within the canvas.
+
+The values from the TextField are used to create a Dreptunghi object, which is then added to a List.
+
+When the Sort button is pressed:
+The rectangle objects in the list are sorted in descending order by area and written to a file.
+*/
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
+class Dreptunghi {
+    private int latime;
+    private int inaltime;
+
+    public Dreptunghi(int latime, int inaltime) {
+        this.latime = latime;
+        this.inaltime = inaltime;
+    }
+
+    public int getLatime() {
+        return latime;
+    }
+
+    public int getInaltime() {
+        return inaltime;
+    }
+
+    public int arie() {
+        return latime * inaltime;
+    }
+}
+
+
+public class DreptunghiApp {
+    private JFrame frame;
+    private JTextField textField;
+    private JButton desenButton;
+    private JButton sorteazaButton;
+    private Canvas canvas;
+    private JLabel label;
+    private List<Dreptunghi> dreptunghiList = new ArrayList<>();
+
+    public static void main(String[] args) {
+        DreptunghiApp app = new DreptunghiApp();
+        app.createGUI();
+    }
+
+    public void createGUI() {
+        frame = new JFrame("Dreptunghi App");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(600, 400);
+
+        textField = new JTextField(20);
+        desenButton = new JButton("Desenează");
+        sorteazaButton = new JButton("Sortează");
+        canvas = new Canvas() {
+            @Override
+            public void paint(Graphics g) {
+                for (Dreptunghi d : dreptunghiList) {
+                    Random rand = new Random();
+                    int x = rand.nextInt(this.getWidth() - d.getLatime());
+                    int y = rand.nextInt(this.getHeight() - d.getInaltime());
+                    g.drawRect(x, y, d.getLatime(), d.getInaltime());
+                }
+            }
+        };
+        label = new JLabel();
+
+        desenButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                deseneazaDreptunghi();
+            }
+        });
+
+        sorteazaButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sorteazaDreptunghiuri();
+            }
+        });
+
+        JPanel panel = new JPanel();
+        panel.add(textField);
+        panel.add(desenButton);
+        panel.add(sorteazaButton);
+        panel.add(label);
+
+        frame.add(panel, BorderLayout.NORTH);
+        frame.add(canvas, BorderLayout.CENTER);
+
+        frame.setVisible(true);
+    }
+
+    private void deseneazaDreptunghi() {
+        String input = textField.getText();
+        String[] parts = input.split("\\s+");
+
+        if (parts.length != 2) {
+            label.setText("Introduceți exact două numere întregi separate prin spațiu.");
+            return;
+        }
+
+        try {
+            int latime = Integer.parseInt(parts[0]);
+            int inaltime = Integer.parseInt(parts[1]);
+
+            if (latime > canvas.getWidth() || inaltime > canvas.getHeight()) {
+                label.setText("Dimensiunile dreptunghiului depășesc dimensiunile canvasului.");
+                return;
+            }
+
+            Dreptunghi dreptunghi = new Dreptunghi(latime, inaltime);
+            dreptunghiList.add(dreptunghi);
+            canvas.repaint();
+            label.setText("");
+
+        } catch (NumberFormatException e) {
+            label.setText("Introduceți doar numere întregi.");
+        }
+    }
+
+    private void sorteazaDreptunghiuri() {
+        Collections.sort(dreptunghiList, (d1, d2) -> Integer.compare(d2.arie(), d1.arie()));
+
+        try (FileWriter writer = new FileWriter("dreptunghiuri_sortate.txt")) {
+            for (Dreptunghi d : dreptunghiList) {
+                writer.write("Latime: " + d.getLatime() + ", Inaltime: " + d.getInaltime() + ", Arie: " + d.arie() + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        label.setText("Dreptunghiurile au fost sortate și salvate în fișier.");
+    }
+}
