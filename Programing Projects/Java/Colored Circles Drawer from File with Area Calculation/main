@@ -1,0 +1,151 @@
+/*
+Create a Java application with a graphical user interface that contains two buttons and a label.
+Define a class Circle with the attributes radius (int) and color (Color), and a method area().
+A text file contains several lines (at least 4), each with integer values separated by spaces, representing values for the radius and the r, g, b components of a color.
+When the first button is clicked: values from each line of the file are read and used to create a Circle object, which is added to a list. The label should display appropriate messages for possible exceptions (e.g., too few values, incorrectly formatted values, or color values exceeding the allowed range).
+When the second button is clicked: all circles in the list are drawn with their respective color at random positions in the frame, without going beyond its borders. The total area of all circles is calculated and displayed in the label, and the list is cleared.
+*/
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;da
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import java.awt.Color;
+
+class Cerc {
+    private int raza;
+    private Color culoare;
+
+    public Cerc(int raza, Color culoare) {
+        this.raza = raza;
+        this.culoare = culoare;
+    }
+
+    public int getRaza() {
+        return raza;
+    }
+
+    public Color getCuloare() {
+        return culoare;
+    }
+
+    public double aria() {
+        return Math.PI * raza * raza;
+    }
+
+    @Override
+    public String toString() {
+        return "Cerc [raza=" + raza + ", culoare=" + culoare + "]";
+    }
+}
+
+
+public class CercApp {
+    private JFrame frame;
+    private JButton citesteButton;
+    private JButton deseneazaButton;
+    private JLabel eticheta;
+    private JPanel canvas;
+    private List<Cerc> cercuri = new ArrayList<>();
+
+    public static void main(String[] args) {
+        CercApp app = new CercApp();
+        app.createGUI();
+    }
+
+    public void createGUI() {
+        frame = new JFrame("Cerc App");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 600);
+
+        citesteButton = new JButton("Citeste");
+        deseneazaButton = new JButton("Deseneaza");
+        eticheta = new JLabel();
+        canvas = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Random rand = new Random();
+                for (Cerc cerc : cercuri) {
+                    g.setColor(cerc.getCuloare());
+                    int x = rand.nextInt(getWidth() - cerc.getRaza() * 2);
+                    int y = rand.nextInt(getHeight() - cerc.getRaza() * 2);
+                    g.fillOval(x, y, cerc.getRaza() * 2, cerc.getRaza() * 2);
+                }
+            }
+        };
+
+        citesteButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                citesteDatele();
+            }
+        });
+
+        deseneazaButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                deseneazaCercuri();
+            }
+        });
+
+        JPanel controlPanel = new JPanel();
+        controlPanel.add(citesteButton);
+        controlPanel.add(deseneazaButton);
+
+        frame.add(controlPanel, BorderLayout.NORTH);
+        frame.add(canvas, BorderLayout.CENTER);
+        frame.add(eticheta, BorderLayout.SOUTH);
+
+        frame.setVisible(true);
+    }
+
+    private void citesteDatele() {
+        String numeFisier = "D:\\Facultate\\An 2\\Semestrul 2\\--- Inginerie software JAVA\\Examen\\Documentatie\\Cerc\\Valori.txt";
+        try (BufferedReader br = new BufferedReader(new FileReader(numeFisier))) {
+            String linie;
+            while ((linie = br.readLine()) != null) {
+                String[] valori = linie.split(" ");
+                if (valori.length != 4) {
+                    eticheta.setText("Linie cu prea putine valori: " + linie);
+                    continue;
+                }
+                try {
+                    int raza = Integer.parseInt(valori[0]);
+                    int r = Integer.parseInt(valori[1]);
+                    int g = Integer.parseInt(valori[2]);
+                    int b = Integer.parseInt(valori[3]);
+                    if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
+                        eticheta.setText("Valori de culoare incorecte: " + linie);
+                        continue;
+                    }
+                    Color culoare = new Color(r, g, b);
+                    Cerc cerc = new Cerc(raza, culoare);
+                    cercuri.add(cerc);
+                } catch (NumberFormatException e) {
+                    eticheta.setText("Valori incorecte: " + linie);
+                }
+            }
+            eticheta.setText("Citirea s-a terminat cu succes.");
+        } catch (IOException e) {
+            eticheta.setText("Eroare la citirea fisierului.");
+        }
+    }
+
+    private void deseneazaCercuri() {
+        double arieTotala = 0;
+        for (Cerc cerc : cercuri) {
+            arieTotala += cerc.aria();
+        }
+        eticheta.setText("Aria totala a cercurilor: " + arieTotala);
+        canvas.repaint();
+        cercuri.clear();
+    }
+}
