@@ -1,0 +1,178 @@
+/*
+Develop a graphical application using AWT or Swing with the following specifications:
+The application includes a drawing area where a square is displayed.
+It has three text fields labeled X, Y, and R used to input the square's position (X, Y) and side length (R).
+It also has a text field labeled "Arie" (Area), which displays the calculated area of the square.
+
+Two buttons are available:
+"Afiseaza" (Display) – to draw the square and calculate its area.
+"Salveaza" (Save) – to write the calculated area to a file.
+A status label shows messages, such as if the square exceeds the drawing boundaries.
+
+Functionality:
+When "Afiseaza" is pressed, a square is drawn in a random color at the given (X, Y) coordinates with side R.
+The application checks if the square fits within the drawing panel. If not, an appropriate message is displayed in the label.
+When "Salveaza" is pressed, the area shown is appended to a local file.
+*/
+
+
+import javax.swing.*;import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Random;
+
+
+class MyJFrame extends JFrame{
+	private MyJPanel zonaDesenare;
+	private JTextField xField, yField, rField;
+	private JPanel textField, butoane, PanelPrincipal;
+	private JTextArea arie;
+	private JButton Afiseaza, Salveaza;
+	private JLabel Eticheta;
+	
+	public MyJFrame(String s) {
+		super(s);
+		this.setLayout(new BorderLayout());
+		
+		zonaDesenare = new MyJPanel();
+		this.add(zonaDesenare, BorderLayout.CENTER);
+		
+		PanelPrincipal = new JPanel();
+		PanelPrincipal.setLayout(new BoxLayout(PanelPrincipal, BoxLayout.Y_AXIS));
+		this.add(PanelPrincipal, BorderLayout.NORTH);
+		
+		textField = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		
+		JLabel xLabel = new JLabel("X = ");
+		JLabel yLabel = new JLabel("Y = ");
+		JLabel rLabel = new JLabel("R = ");
+		
+		xField = new JTextField(4);
+		yField = new JTextField(4);
+		rField = new JTextField(4);
+		
+		textField.add(xLabel);
+		textField.add(xField);
+		textField.add(yLabel);
+		textField.add(yField);
+		textField.add(rLabel);
+		textField.add(rField);
+		
+		arie = new JTextArea("Aria = ");
+		textField.add(arie);
+		
+		PanelPrincipal.add(textField);
+		
+		butoane = new JPanel(new FlowLayout(FlowLayout.LEFT));
+		Afiseaza = new JButton("Afiseaza");
+		Salveaza = new JButton("Salveaza");
+		butoane.add(Afiseaza);
+		butoane.add(Salveaza);
+		
+		PanelPrincipal.add(butoane);
+		
+		Eticheta = new JLabel();
+		PanelPrincipal.add(Eticheta);
+		
+		Afiseaza.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				AfisarePatrat();
+				
+			}
+		});
+		
+		Salveaza.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String continut = arie.getText();
+				scriereFisier(continut);
+				
+			}
+		});
+		
+		this.setSize(500,500);
+		this.setVisible(true);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+	
+	private void AfisarePatrat() {
+		try {
+			int x = Integer.parseInt(xField.getText());
+			int y = Integer.parseInt(yField.getText());
+			int r = Integer.parseInt(rField.getText());
+			
+			double ariePatrat = r * r;
+			zonaDesenare.setPatrat(x, y, r, Eticheta);
+			arie.setText("Aria = " + String.format("%.2f", ariePatrat));
+			
+		}catch (NumberFormatException e) {
+			JOptionPane.showMessageDialog(this, "Te rog introdu valori numerice valide.", "Eroare", JOptionPane.ERROR_MESSAGE);
+		}
+	}
+	
+	public void scriereFisier(String continut) {
+		try(BufferedWriter writer = new BufferedWriter(new FileWriter("D:\\Facultate\\An 2\\Semestrul 2\\--- Inginerie software JAVA\\Examen\\Rezultate.txt", true))){
+			writer.write(continut + "\n");
+		}catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+}
+class MyJPanel extends JPanel{
+	
+	private int x = -1, y = -1, r = -1;
+	
+	public void setPatrat(int x, int y, int r, JLabel Eticheta) {
+		// Verificăm dacă poziția de desenare depășește dimensiunea componentei
+        if (x + r > getWidth() || y + r > getHeight()) {
+            // Dacă depășește, setăm dimensiunile negative pentru a indica depășirea
+            this.x = -1;
+            this.y = -1;
+            this.r = -1;
+            // Afișăm un mesaj în etichetă
+            Eticheta.setText("Depășire zonă de desenare");
+        } else {
+            this.x = x;
+            this.y = y;
+            this.r = r;
+            // Ștergem mesajul dacă dimensiunea este în limitele zonei de desenare
+            Eticheta.setText("");
+        }
+        repaint();
+	}
+	
+	public Color CuloareRandom() {
+		Random rand = new Random();
+		int red = rand.nextInt(255);
+		int green = rand.nextInt(255);
+		int blue = rand.nextInt(255);
+		return new Color(red, green, blue);
+		
+	}
+	
+	@Override
+	protected void paintComponent(Graphics g) {
+		super.paintComponent(g);
+		if (r > 0) {
+			g.setColor(CuloareRandom());
+			g.fillRect(x, y, r, r);
+		}
+	}
+}
+
+
+public class Prob_1 {
+
+	public static void main(String[] args) {
+		MyJFrame Frame = new MyJFrame("Problema 1");
+
+	}
+
+}
