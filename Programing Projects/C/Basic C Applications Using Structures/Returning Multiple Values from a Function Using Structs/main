@@ -1,0 +1,43 @@
+/*
+Write a C program where a function returns a suitable structure to return multiple values. Display the result along with the initial values passed to the function.
+*/
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <math.h>
+
+struct Valori {
+    int var1;
+    int var2;
+};
+
+struct Rezultate {
+    int aria;
+    float diagonala;
+};
+
+struct Rezultate OperatiMatematice(struct Valori date);
+
+int main() {
+    struct Valori date1 = { 2, 3 };
+    struct Valori date2 = { 5, 4 };
+
+    struct Rezultate rez1 = OperatiMatematice(date1);
+    struct Rezultate rez2 = OperatiMatematice(date2);
+
+    printf("Rezultate pentru date1:\n");
+    printf("Aria dreptunghiului cu laturile %d si %d este egala cu %d\n", date1.var1, date1.var2, rez1.aria);
+    printf("Diagonala dreptunghiului cu laturile %d si %d este %.2f\n", date1.var1, date1.var2, rez1.diagonala);
+
+    printf("\nRezultate pentru date2:\n");
+    printf("Aria dreptunghiului cu laturile %d si %d este egala cu %d\n", date2.var1, date2.var2, rez2.aria);
+    printf("Diagonala dreptunghiului cu laturile %d si %d este %.2f\n", date2.var1, date2.var2, rez2.diagonala);
+
+    return 0;
+}
+
+struct Rezultate OperatiMatematice(struct Valori date) {
+    struct Rezultate rez;
+    rez.aria = date.var1 * date.var2;
+    rez.diagonala = sqrt(pow(date.var1, 2) + pow(date.var2, 2));
+    return rez;
+}
