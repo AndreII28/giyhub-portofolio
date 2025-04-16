@@ -1,0 +1,56 @@
+import random
+from game_data import data
+from art import logo
+from art import vs
+
+game_status = True
+same_person = True
+score = 0
+
+def random_person_generator():
+    data_base = data
+    random_person = random.choice(data_base)
+    return random_person
+
+def compare_persons(a, b, player_guess):
+    a = person_A["follower_count"]
+    b = person_B["follower_count"]
+    if player_guess == "a":
+        if a > b:
+            return True
+        else:
+            return False
+    else:
+        if a < b:
+            return True
+        else:
+            return False
+
+person_A = random_person_generator()
+person_B = random_person_generator()
+
+while game_status:
+    print("\n"*20)
+    print(logo)
+    if score != 0:
+        print(f"You're right! Current score: {score}")
+    print(f"Compare A: {person_A["name"]}, a {person_A["description"]}, from {person_A["country"]}.")
+    print(vs)
+    print(f"Against B: {person_B["name"]}, a {person_B["description"]}, from {person_B["country"]}.")
+    player_guess = input("Who hase more followers? Type 'A' or 'B': ").lower()
+    if compare_persons(person_A,person_B, player_guess):
+        person_A = person_B
+        while same_person:
+            person_B = random_person_generator()
+            if person_A == person_B:
+                same_person = True
+            else:
+                same_person = False
+        score += 1
+        same_person = True
+
+    else:
+        print(f"Sorry, that's wrong. Final score: {score}.")
+        game_status = False
+
+
