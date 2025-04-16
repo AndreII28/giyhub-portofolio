@@ -1,0 +1,59 @@
+/* RebelesAndrei_2521_lab11_nr.prob4
+Write a C application that dynamically allocates memory for n strings, which will be entered from the keyboard.
+--------------------------------------------------------------------------------------------------*/
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+	int n;
+	printf("Cate siruri de caractere doriti sa introduceti? ");
+	scanf("%d", &n);
+
+	// Alocă memorie pentru pointerii la șiruri
+	char** siruri = (char**)malloc(n * sizeof(char*));
+	if (siruri == NULL) {
+		printf("Eroare la alocarea memoriei.\n");
+		return 1;
+	}
+
+	// Citirea fiecărui șir de caractere
+	printf("Introduceti sirurile de caractere:\n");
+	for (int i = 0; i < n; i++) {
+		printf("Sirul %d: ", i + 1);
+		int capacitate = 1; 
+		int lungime = 0; 
+		char* sir = (char *)malloc(capacitate);
+		if (sir == NULL) {
+			printf("Eroare la alocarea memoriei pentru sirul %d.\n", i + 1);
+			return 1;
+		}
+
+		// Citirea caracter cu caracter
+		char ch;
+		while ((ch = getchar()) != '\n' && ch != EOF) {
+			if (lungime + 1 >= capacitate) { // +1 pentru '\0'
+				capacitate *= 2; // Dublează capacitatea
+				char* nouSir =(char *)realloc(sir, capacitate);
+				if (nouSir == NULL) {
+					printf("Eroare la realocarea memoriei pentru sirul %d.\n", i + 1);
+					free(sir);
+					return 1;
+				}
+				sir = nouSir;
+			}
+			sir[lungime++] = ch; 
+		}
+		sir[lungime] = '\0'; 
+		siruri[i] = sir; 
+	}
+
+
+	// Eliberează memoria alocată
+	for (int i = 0; i < n; i++) {
+		free(siruri[i]);
+	}
+	free(siruri);
+
+	return 0;
+}
