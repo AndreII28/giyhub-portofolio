@@ -1,0 +1,84 @@
+/*
+Create a Java Swing application that allows the user to open and read the content of a text file. The app includes:
+A button to open a file using a file chooser.
+A non-editable text area for displaying file content.
+A label for showing the status (success, error, or cancellation).
+Functionality:
+When the user clicks "Open File", a file chooser dialog appears.
+If a file is selected, its content is read line by line and displayed in the text area.
+A status message is shown depending on the outcome (success, error, or cancel).
+*/
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+
+public class FileReaderApp extends JFrame {
+    private JButton openButton;
+    private JTextArea textArea;
+    private JLabel statusLabel;
+
+    public FileReaderApp() {
+        setTitle("File Reader");
+        setSize(600, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        openButton = new JButton("Open File");
+        textArea = new JTextArea();
+        textArea.setEditable(false);
+        statusLabel = new JLabel("Select a file to read");
+
+        JScrollPane scrollPane = new JScrollPane(textArea);
+        
+        openButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                openFile();
+            }
+        });
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.add(openButton, BorderLayout.NORTH);
+        panel.add(scrollPane, BorderLayout.CENTER);
+        panel.add(statusLabel, BorderLayout.SOUTH);
+
+        add(panel);
+    }
+
+    private void openFile() {
+        JFileChooser fileChooser = new JFileChooser();
+        int result = fileChooser.showOpenDialog(this);
+        
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            try (BufferedReader reader = new BufferedReader(new FileReader(selectedFile))) {
+                textArea.setText(""); // Clear previous content
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    textArea.append(line + "\n");
+                }
+                statusLabel.setText("File loaded successfully.");
+            } catch (IOException ex) {
+                statusLabel.setText("Error reading file: " + ex.getMessage());
+            }
+        } else {
+            statusLabel.setText("File selection cancelled.");
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new FileReaderApp().setVisible(true);
+            }
+        });
+    }
+}
