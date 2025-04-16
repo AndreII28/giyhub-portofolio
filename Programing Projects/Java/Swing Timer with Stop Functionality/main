@@ -1,0 +1,98 @@
+/*
+This Java program creates a graphical user interface (GUI) using Swing that displays a timer. The timer starts automatically when the application launches and updates every second. A "Stop Timer" button allows the user to stop the timer.
+*/
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+class TimerRunnable implements Runnable {
+    private final JLabel label;
+    private boolean running;
+    private int seconds;
+
+    public TimerRunnable(JLabel label) {
+        this.label = label;
+        this.running = true;
+        this.seconds = 0;
+    }
+
+    @Override
+    public void run() {
+        while (running) {
+            try {
+                Thread.sleep(1000);
+                seconds++;
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        label.setText("Time elapsed: " + seconds + " seconds");
+                    }
+                });
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    public void stop() {
+        running = false;
+    }
+}
+
+
+public class TimerApp extends JFrame {
+    private JLabel timerLabel;
+    private TimerRunnable timerRunnable;
+    private Thread timerThread;
+
+    public TimerApp() {
+        setTitle("Timer App");
+        setSize(300, 200);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        timerLabel = new JLabel("Time elapsed: 0 seconds", SwingConstants.CENTER);
+        JButton stopButton = new JButton("Stop Timer");
+
+        stopButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                stopTimer();
+            }
+        });
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BorderLayout());
+        panel.add(timerLabel, BorderLayout.CENTER);
+        panel.add(stopButton, BorderLayout.SOUTH);
+
+        add(panel);
+
+        // Start the timer automatically
+        startTimer();
+    }
+
+    private void startTimer() {
+        if (timerThread == null || !timerThread.isAlive()) {
+            timerRunnable = new TimerRunnable(timerLabel);
+            timerThread = new Thread(timerRunnable);
+            timerThread.start();
+        }
+    }
+
+    private void stopTimer() {
+        if (timerRunnable != null) {
+            timerRunnable.stop();
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new TimerApp().setVisible(true);
+            }
+        });
+    }
+}
