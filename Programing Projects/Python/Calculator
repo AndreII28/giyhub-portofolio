@@ -1,0 +1,53 @@
+import art
+print(art.logo)
+def add(n1, n2):
+    return n1 + n2
+
+def subtract(n1, n2):
+    return n1 - n2
+
+def multiply(n1, n2):
+    return n1 * n2
+
+def divide(n1, n2):
+    return n1 / n2
+
+operations = {
+    "+" : add,
+    "-" : subtract,
+    "*" : multiply,
+    "/" : divide,
+}
+
+def operator():
+    return print("+\n-\n*\n/")
+
+run = True
+new_calculation = ""
+result = 0
+
+while run:
+    if new_calculation == "y":
+        operator()
+        new_operation = input("Pick an operation: ")
+        n3 = float(input("What is the new number?: "))
+        old_result = result
+        result = operations[new_operation](result, n3)
+
+        print("\n------------------------------------")
+        print(f"{old_result} {new_operation} {n3} = {result}")
+        print("------------------------------------\n")
+        new_calculation = input(f"Type 'Y' to continue calculating with {result}, or 'N' to start a new calculation or 'STOP' for closeing:").lower()
+    elif new_calculation == "stop":
+        run = False
+    else:
+        n1 = float(input("What's the first number?: "))
+        operator()
+        operation = input("Pick an operation: ")
+        n2 = float(input("What's the next number?: "))
+        result = operations[operation](n1,n2)
+
+        print("\n------------------------------------")
+        print(f"{n1} {operation} {n2} = {result}")
+        print("------------------------------------\n")
+        new_calculation = input(f"Type 'Y' to continue calculating with {result}, or 'N' to start a new calculation or 'STOP' for closeing:" ).lower()
