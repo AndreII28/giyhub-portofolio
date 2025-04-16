@@ -1,0 +1,102 @@
+/*
+Write a C program that uses a structure named student, with the fields {name, surname, country of origin, group, year of birth}. 
+The program should determine and display the number of foreign students (based on the country) in the group (with a maximum of MAX students) and print their complete information. 
+The data is read from standard input until the name "AAA" is entered.
+*/
+
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX 20
+
+struct student
+{
+	char nume[30];
+	char prenume[30];
+	char TaraDeOrigine[30];
+	char grupa[5];
+	char AnulNasteri[5];
+};
+
+void Studenti(struct student *s);
+void AfisareStudenti(struct student *s);
+
+int main() {
+	struct student* s;
+	int i, n, contor = 0, inscrieri = 0;
+	int opresteCitire = 0;
+	printf("\nNumar studenti : ");
+	scanf("%d", &n);
+	if (n <= 0 || n > MAX) {
+		printf("\n Numar invalid (negativ) !\n");
+		return 0;
+	}
+
+	//printf("Lungime student %d\n", sizeof(struct student));
+
+	if (!(s = (struct student*)malloc(n * sizeof(struct student)))) {
+		printf("Alocare nereussita!");
+		return 0;
+	}
+
+	printf("\n Introduceti datele studentilor :\n");
+	
+	for (i = 0; i < n && !opresteCitire; i++) {
+		printf("\nStudenltul %d", i + 1);
+		Studenti(s + i);
+
+		if (strcmp((s + i)->nume, "AAA") == 0) {
+			opresteCitire = 1;
+		}
+		else {
+			inscrieri++;
+		}
+	}
+	
+	printf("\n Studenti straini sunt: \n");
+	for (i = 0; i < inscrieri; i++) {
+		if (strcmp((s + i)->TaraDeOrigine, "Romania") != 0)
+			contor++;
+			printf("\nStudentul %d:", i + 1);
+			AfisareStudenti(s + i);
+			if (strcmp(((s+i)->nume), "AAA") == 0) {
+				contor--;
+			}
+	}
+	printf("Numarul de stundenti straini este %d\n", contor);
+	// Eliberăm memoria alocată
+	free(s);
+
+}
+void Studenti(struct student* s) {
+	printf("\nNumele: ");
+	scanf("%s", s->nume);
+	if (strcmp((s->nume), "AAA") == 0) {
+		return;
+	}
+	printf("\nPrenume: ");
+	scanf("%s", s->prenume);
+	printf("\nTara de origine: ");
+	scanf("%s", s->TaraDeOrigine);
+	printf("\nGrupa: ");
+	scanf("%s", s->grupa);
+	printf("\nAnul nasteri: ");
+	scanf("%s", s->AnulNasteri);
+}
+
+void AfisareStudenti(struct student *s) {
+	//printf("\n");
+	if (strcmp((s->nume), "AAA") == 0) {
+		return;
+	}
+	if (strlen(s->nume) == 0) {
+		return;
+	}
+	printf("\nNumele: %s", s->nume);
+	printf("\nPrenume: %s", s->prenume);
+	printf("\nTara de origine: %s", s->TaraDeOrigine);
+	printf("\nGrupa: %s", s->grupa);
+	printf("\nAnul nasteri: %s", s->AnulNasteri);
+	printf("\n");
+}
