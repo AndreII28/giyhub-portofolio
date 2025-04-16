@@ -1,4 +1,4 @@
-/* RebelesAndrei_2521_lab11_nr.prob2
+/*
 Create a program for a distributed management application tracking activity in 5 cities. Each city has 3 sales offices. Inside a function, create an array of 5 float pointers,
 each pointing to dynamically allocated memory with 3 float values representing daily sales. Include:
 A function to input data for all 5 cities and their 3 shops.
