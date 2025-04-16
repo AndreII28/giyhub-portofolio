@@ -1,0 +1,118 @@
+/*
+The data of first-year students is stored in a text file with the following format:
+N  
+Student 1 Last Name  
+Student 1 First Name  
+Student 1 Registration Number  
+Student 1 Group  
+Student 1 Grades  
+Student 2 Last Name  
+Student 2 First Name  
+Student 2 Registration Number  
+Student 2 Group  
+Student 2 Grades  
+...
+Where N is the total number of students in the year. Last name and first name are strings of maximum length 30, the registration number is a natural number with a maximum of 8 digits,
+the group is a natural number with a maximum of 4 digits, and grades is an array of 20 real numbers.
+Read the data from the file into an appropriate structure, with memory dynamically allocated.
+Display on the screen the students who have failed (any grade[i] < 5).
+Write into another file the data of students eligible for scholarships (average grade > 8).
+*/
+
+//Antet functii
+void citire(FILE*, Studenti*, int);
+void afisare(struct Studenti* s, int);
+void restantieri(struct Studenti* s, int);
+void studbursa(FILE*, Studenti*, int);
+
+int main() {
+	//creare pointeri la diferite fisiere
+	FILE *fp;
+	char Nume_Fisier[] = "D:\\PregatireExamenC\\ListaStudenti.txt";
+	fp = fopen(Nume_Fisier, "r"); //citire fisier studenti
+	FILE* b;
+	char Lista_Bursa[] = "D:\\PregatireExamenC\\ListaStudentiCuBursa.txt";
+	b = fopen(Lista_Bursa, "w+"); // creare si scriere fisier studenti cu bursa
+
+	int n,i,j;
+	printf("Ca-ti studenti doriti sa introduceti in baza de date? ");
+	scanf("%d", &n);
+	struct Studenti* s = (Studenti*)malloc(n * sizeof(Studenti)); // alocarea memoriei dinamic
+
+	
+	if (n < 0 || n>20) {
+		printf("Numarul de studenti nu trebuie sa depaseasca 20 sau sa fie negativ!");
+		return 0;
+	}
+	//apelarea functiilor
+	citire(fp, s, n);
+	printf("\nDatele studentilor cu restanta sunt: \n");
+	restantieri(s, n);
+
+	studbursa(b, s, n);
+	//inchidere fisiere
+	fclose(fp);
+	fclose(b);
+	//afisare(s, n);
+
+	//Dealocare memorie
+	free(s);
+}
+
+//Functie de citire a datelor din fisier, ai exemplu de fisier in folder numit "ListaStudenti"
+void citire(FILE* fp, Studenti* s, int n) {
+	int i;
+	for (i = 0; i < n; i++) {
+		fscanf(fp, "%s %s %ld %d %f %f %f", &(s + i)->NumeStudent, &(s + i)->PrenumeStudent, &(s + i)->NumarMatricol, &(s + i)->Grupa, &(s + i)->Note[0], &(s + i)->Note[1], &(s + i)->Note[2]);
+	}
+}
+void afisare(struct Studenti* s, int n) {
+int i;
+	for (i = 0; i < n; i++) {
+		printf("\nNume: %s", (s + i)->NumeStudent);
+		printf("\nPrenume: %s", (s + i)->PrenumeStudent);
+		printf("\nNumar matricol: %ld", (s + i)->NumarMatricol);
+		printf("\nGrupa: %d", (s + i)->Grupa);
+		printf("\nNota 1: %.2f", (s + i)->Note[0]);
+		printf("\nNota 2: %.2f", (s + i)->Note[1]);
+		printf("\nNota 3: %.2f", (s + i)->Note[2]);
+		printf("\n");
+	}
+}
+
+// Functie de afisare a studentilor restantieri
+void restantieri(struct Studenti* s, int n) {
+	int i;
+	for (i = 0; i < n; i++) { 
+		float restanta = ((((s + i)->Note[0]) + ((s + i)->Note[1]) + ((s + i)->Note[2])) / 3);//calculul mediei
+		if (restanta < 5) {
+			printf("\nStudentul %d", i+1);
+			printf("\nNume: %s", (s + i)->NumeStudent);
+			printf("\nPrenume: %s", (s + i)->PrenumeStudent);
+			printf("\nNumar matricol: %ld", (s + i)->NumarMatricol);
+			printf("\nGrupa: %d", (s + i)->Grupa);
+			printf("\nNota 1: %.2f", (s + i)->Note[0]);
+			printf("\nNota 2: %.2f", (s + i)->Note[1]);
+			printf("\nNota 3: %.2f", (s + i)->Note[2]);
+			printf("\n");
+		}
+	}
+}
+// Functie de verificare studenti daca au bursa si scrierea lor intr-un fisier nou
+void studbursa(FILE* b, Studenti* s, int n) {
+	int i;
+	for (i = 0; i < n; i++) {
+		float bursa = ((((s + i)->Note[0]) + ((s + i)->Note[1]) + ((s + i)->Note[2])) / 3);
+		if (bursa > 8) {
+			fprintf(b,"\nStudentul %d", i + 1);
+			fprintf(b,"\nNume: %s", (s + i)->NumeStudent);
+			fprintf(b,"\nPrenume: %s", (s + i)->PrenumeStudent);
+			fprintf(b,"\nNumar matricol: %ld", (s + i)->NumarMatricol);
+			fprintf(b,"\nGrupa: %d", (s + i)->Grupa);
+			fprintf(b,"\nNota 1: %.2f", (s + i)->Note[0]);
+			fprintf(b,"\nNota 2: %.2f", (s + i)->Note[1]);
+			fprintf(b,"\nNota 3: %.2f", (s + i)->Note[2]);
+			fprintf(b,"\n");
+		}
+	}
+}
