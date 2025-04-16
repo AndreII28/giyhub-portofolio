@@ -1,5 +1,5 @@
 
-/* RebelesAndrei_2521_lab11_nr.prob3
+/*
 Write a C application that dynamically allocates memory for two matrices of size m rows and n columns. 
 Create a function to calculate the sum of the two matrices and another function to display a matrix. Show the initial matrices and the resulting summed matrix.
 --------------------------------------------------------------------------------------------------*/
