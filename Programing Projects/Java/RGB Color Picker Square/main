@@ -1,0 +1,96 @@
+/*
+Create a Java application that includes 3 slider elements, which can be used to set the color of a 100x100 square. The square will be drawn in a dedicated component (Canvas, etc.).
+*/
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+
+import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+class MyFrame2 extends JFrame{
+    MyPanel2 myPanel2;
+    public MyFrame2() {
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setSize(400,400);
+        this.setLayout(new BorderLayout());
+        myPanel2 = new MyPanel2();
+        this.add(myPanel2, BorderLayout.CENTER);
+        this.setVisible(true);
+    }
+}
+
+class MyPanel2 extends JPanel{
+    private int red = 0;
+    private int green = 0;
+    private int blue = 0;
+    private JPanel patratPanel;
+
+    public MyPanel2() {
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+
+        JPanel slidePanel1 = new JPanel(new FlowLayout());
+        JLabel label1 = new JLabel("Red");
+        JSlider slider1 = new JSlider(0, 255, 0);
+        slider1.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                red = slider1.getValue();
+                updatePatratColor();
+            }
+        });
+        slidePanel1.add(label1);
+        slidePanel1.add(slider1);
+        this.add(slidePanel1);
+
+
+        JPanel slidePanel2 = new JPanel(new FlowLayout());
+        JLabel label2 = new JLabel("Green");
+        JSlider slider2 = new JSlider(0, 255, 0);
+        slider2.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                green = slider2.getValue();
+                updatePatratColor();
+            }
+        });
+        slidePanel2.add(label2);
+        slidePanel2.add(slider2);
+        this.add(slidePanel2);
+
+
+        JPanel slidePanel3 = new JPanel(new FlowLayout());
+        JLabel label3 = new JLabel("Blue");
+        JSlider slider3 = new JSlider(0, 255, 0);
+        slider3.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                blue = slider3.getValue();
+                updatePatratColor();
+            }
+        });
+        slidePanel3.add(label3);
+        slidePanel3.add(slider3);
+        this.add(slidePanel3);
+
+        patratPanel = new JPanel();
+        patratPanel.setPreferredSize(new Dimension(200, 200));
+        this.add(patratPanel);
+
+        updatePatratColor();
+    }
+
+    private void updatePatratColor() {
+        Color color = new Color(red, green, blue);
+        patratPanel.setBackground(color);
+    }
+}
+
+public class Problema_2 {
+    public static void main(String[] args) {
+        MyFrame2 frame = new MyFrame2();
+    }
+}
+
