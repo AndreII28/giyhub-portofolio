@@ -1,0 +1,76 @@
+import random
+rock = '''
+    _______
+---'   ____)
+      (_____)
+      (_____)
+      (____)
+---.__(___)
+'''
+
+paper = '''
+    _______
+---'   ____)____
+          ______)
+          _______)
+         _______)
+---.__________)
+'''
+
+scissors = '''
+    _______
+---'   ____)____
+          ______)
+       __________)
+      (____)
+---.__(___)
+'''
+
+game_list = [rock,paper,scissors]
+game_list_name = ["Rock","Paper","Scissors"]
+pc_random = random.randint(0,2)
+
+player_input = int(input("What do you choose? Type 0 for Rock, 1 for Paper or 2 for Scissors. \n"))
+
+if  player_input < 0 or player_input > 2:
+    print("Invalid choise")
+
+print("-----------------------------------------------------\n")
+print(f"You chose: {game_list_name[player_input]}\n {game_list[player_input]}\n")
+print(f"PC chose: {game_list_name[pc_random]}\n{game_list[pc_random]}\n")
+print("-----------------------------------------------------\n")
+
+if player_input == pc_random:
+    print("It's a draw")
+
+if player_input == 0:
+    if pc_random == 1:
+        print("You Lose!")
+    if pc_random == 2:
+        print("You Win!")
+
+if player_input == 1:
+    if pc_random == 2:
+        print("You Lose!")
+    if pc_random == 0:
+        print("You Win!")
+
+if player_input == 2:
+    if pc_random == 0:
+        print("You Lose!")
+    if pc_random == 1:
+        print("You Win!")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
