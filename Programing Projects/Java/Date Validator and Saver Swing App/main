@@ -1,0 +1,79 @@
+/*
+Create a Java Swing application that allows the user to input a date in the format DD/MM/YYYY. The app includes:
+A text field for entering the date.
+A Save Date button.
+A label for displaying messages.
+Functionality:
+When the button is clicked, the app checks if the input matches the format using regular expressions.
+If valid, the date is appended to a text file named dates.txt.
+If the format is incorrect, an error message is shown in the label.
+*/
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class DateApp extends JFrame {
+	private JTextField dateField;
+	private JButton saveButton;
+	private JLabel messageLabel;
+
+	public DateApp() {
+		setTitle("Date Writer App");
+		setSize(400, 200);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setLocationRelativeTo(null);
+
+		dateField = new JTextField(20);
+		saveButton = new JButton("Save Date");
+		messageLabel = new JLabel("");
+
+		saveButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String dateText = dateField.getText();
+				if (validateDate(dateText)) {
+					saveDateToFile(dateText);
+				} else {
+					messageLabel.setText("Invalid date format. Please use DD/MM/YYYY.");
+				}
+			}
+		});
+
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridLayout(4, 1));
+		panel.add(new JLabel("Enter date (DD/MM/YYYY):"));
+		panel.add(dateField);
+		panel.add(saveButton);
+		panel.add(messageLabel);
+
+		add(panel);
+	}
+
+	private boolean validateDate(String dateText) {
+		return dateText.matches("^\\d{2}/\\d{2}/\\d{4}$");
+	}
+
+	private void saveDateToFile(String dateText) {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter("dates.txt", true))) {
+			writer.write(dateText);
+			writer.newLine();
+			messageLabel.setText("Date saved successfully.");
+		} catch (IOException e) {
+			messageLabel.setText("Error saving date.");
+		}
+	}
+
+	public static void main(String[] args) {
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				new DateApp().setVisible(true);
+			}
+		});
+	}
+}
