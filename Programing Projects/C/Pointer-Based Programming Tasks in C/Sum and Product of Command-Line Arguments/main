@@ -1,0 +1,32 @@
+/* RebelesAndrei_2521_lab10
+Read two integer and two float parameters from the command line. Display their sum and product.
+-------------------------------------------------------------------------------*/
+
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char* argv[]) {
+
+	if (argc != 5) {
+		printf("Trebuie sa introduci exact doi parametri intrgi si doi parametri flotanti.\n");
+		return 1;
+	}
+	int intreg1 = atoi(argv[1]);
+	int intreg2 = atoi(argv[2]);
+	float zecimal1 = atof(argv[3]);
+	float zecimal2 = atof(argv[4]);
+
+	int sumintreg = intreg1 + intreg2;
+	float sumzecimal = zecimal1 + zecimal2;
+
+	int prodintreg = intreg1 * intreg2;
+	float prodzecimal = zecimal1 * zecimal2;
+
+	printf("Suma celor doi intregilor este: %d\n", sumintreg);
+	printf("Suma celor doua numere zecimale este: %.2f\n", sumzecimal);
+	printf("Produsul celor doua numere intregi este: %d\n", prodintreg);
+	printf("Produsul celor doua numere zecimale este: %.2f", prodzecimal);
+
+	return 0;
+}
