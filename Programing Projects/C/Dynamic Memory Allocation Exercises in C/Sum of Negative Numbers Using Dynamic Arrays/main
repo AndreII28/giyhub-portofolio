@@ -1,4 +1,4 @@
-/* RebelesAndrei_2521_lab11_nr.prob1
+/* 
 Write a program that reads n real numbers, stores them in a dynamically allocated array, calculates and displays the sum of the negative numbers, and finally frees the allocated memory.
 --------------------------------------------------------------------------------------------------*/
 #define _CRT_SECURE_NO_WARNINGS
