@@ -1,0 +1,145 @@
+/*
+Create a Java application with a graphical interface containing a TextField input, a Label, a Verify button, a Sort button, and a TextArea.
+Users can input a calendar date in the format day/month/year (all numeric). Only digits and the '/' character are allowed in the input.
+When the Verify button is pressed, the input date is validated: day must be between 1–31, month between 1–12, and year between 1900–2023. If all parts are valid, a DataC object (custom class modeling a date) is created, added to a list, and displayed in the TextArea on a new line.
+If the input is invalid, an exception is thrown and an appropriate message is shown in the Label.
+When the Sort button is pressed, the list of DataC objects is sorted in descending order by year and displayed line by line in the TextArea.
+*/
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+class DataC implements Comparable<DataC> {
+    private int zi;
+    private int luna;
+    private int an;
+
+    public DataC(int zi, int luna, int an) {
+        this.zi = zi;
+        this.luna = luna;
+        this.an = an;
+    }
+
+    public int getZi() {
+        return zi;
+    }
+
+    public int getLuna() {
+        return luna;
+    }
+
+    public int getAn() {
+        return an;
+    }
+
+    @Override
+    public String toString() {
+        return zi + "/" + luna + "/" + an;
+    }
+
+    @Override
+    public int compareTo(DataC other) {
+        if (this.an != other.an) {
+            return other.an - this.an;
+        } else if (this.luna != other.luna) {
+            return other.luna - this.luna;
+        } else {
+            return other.zi - this.zi;
+        }
+    }
+}
+
+
+
+public class DataCApp {
+    private JFrame frame;
+    private JTextField textField;
+    private JButton verificaButton;
+    private JButton sorteazaButton;
+    private JTextArea textArea;
+    private JLabel label;
+    private List<DataC> dataList = new ArrayList<>();
+
+    public static void main(String[] args) {
+        DataCApp app = new DataCApp();
+        app.createGUI();
+    }
+
+    public void createGUI() {
+        frame = new JFrame("DataC App");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(600, 400);
+
+        textField = new JTextField(20);
+        verificaButton = new JButton("Verifica");
+        sorteazaButton = new JButton("Sorteaza");
+        textArea = new JTextArea(10, 50);
+        textArea.setEditable(false);
+        label = new JLabel();
+
+        verificaButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                verificaData();
+            }
+        });
+
+        sorteazaButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sorteazaData();
+            }
+        });
+
+        JPanel panel = new JPanel();
+        panel.add(textField);
+        panel.add(verificaButton);
+        panel.add(sorteazaButton);
+        panel.add(label);
+
+        frame.add(panel, BorderLayout.NORTH);
+        frame.add(new JScrollPane(textArea), BorderLayout.CENTER);
+
+        frame.setVisible(true);
+    }
+
+    private void verificaData() {
+        String input = textField.getText();
+        String[] parts = input.split("/");
+
+        if (parts.length != 3) {
+            label.setText("Format incorect. Utilizati zi/luna/an.");
+            return;
+        }
+
+        try {
+            int zi = Integer.parseInt(parts[0]);
+            int luna = Integer.parseInt(parts[1]);
+            int an = Integer.parseInt(parts[2]);
+
+            if (zi < 1 || zi > 31 || luna < 1 || luna > 12 || an < 1900 || an > 2023) {
+                throw new NumberFormatException();
+            }
+
+            DataC data = new DataC(zi, luna, an);
+            dataList.add(data);
+            textArea.append(data.toString() + "\n");
+            label.setText("");
+        } catch (NumberFormatException e) {
+            label.setText("Date incorecte. Ziua trebuie sa fie intre 1-31, luna intre 1-12, anul intre 1900-2023.");
+        }
+    }
+
+    private void sorteazaData() {
+        Collections.sort(dataList);
+        textArea.setText("");
+        for (DataC data : dataList) {
+            textArea.append(data.toString() + "\n");
+        }
+    }
+}
