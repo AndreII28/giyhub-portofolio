@@ -1,0 +1,86 @@
+/*
+Write a program that defines a structure named Book, with the following fields:
+author – string of max 30 characters
+title – string of max 30 characters
+number of pages – integer
+In the main() function:
+Dynamically create an array of up to n = 10 elements of type Book, where n is entered from the command line (keyboard).
+Read each book’s data (author, title, pages) from the keyboard.
+Using a separate function, display information about the books with more than 100 pages.
+Write that information to a file named Fis_rez.txt, each book’s data being printed on a separate line.
+Constants should be used for all imposed fixed values.
+*/
+
+
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#define MaxChar 30 
+#define MaxCarti 10
+
+//creare structura
+struct carte {
+	char autor[MaxChar];
+	char titlu[MaxChar];
+	int NumarPagini;
+};
+
+//antet functii
+void CitireDate(struct carte*,int );
+void ScriereInFisier(FILE*, struct carte*, int );
+
+int main() {
+	struct carte* biblioteca; //pointer la structura
+	int n;
+
+	FILE* fp;
+	char NumeFisier[] = "D:\\PregatireExamenC\\Fis_rez.txt";// intre "" se scrie calea catre fisierul.txt (in acest caz se scrie numele fisierului si daca nu e creat, se va crea in linia urmatoare)
+	fp = fopen(NumeFisier, "w"); //Creare fisier (include si cele 2 lini de sus)
+
+	printf("Introduceti numarul de carti (maxim %d): ", MaxCarti);
+	scanf("%d", &n);
+
+	if (n > MaxCarti || n <= 0) {
+		printf("Numar invalid de carti.\n");
+		return 1;
+	}
+
+	biblioteca = (struct carte*)malloc(n * sizeof(struct carte)); // alocare dinamica a memoriei
+	
+	//testare daca sa alocat memoria
+	if (biblioteca == NULL) {
+		printf("Eroare la alocarea memoriei.\n");
+		return 1;
+	}
+
+	CitireDate(biblioteca, n);// apel la functia de citire
+	ScriereInFisier(fp, biblioteca, n); // apel la functia de scriere
+	
+	free(biblioteca); // Eliberarea memoriei și alte operațiuni necesare
+	fclose(fp); // Inchidere fisier
+	return 0;
+}
+
+void CitireDate(struct carte* biblioteca, int n) {
+	for (int i = 0; i < n; i++) {
+		printf("\nIntroduceti autorul cartii %d: ", i + 1);
+		scanf("%s", biblioteca[i].autor); // Presupunem că nu există spații în numele autorului
+		printf("Introduceti titlul cartii %d: ", i + 1);
+		scanf("%s", biblioteca[i].titlu); // La fel, presupunem că nu există spații în titlu
+		printf("Introduceti numarul de pagini al cartii %d: ", i + 1);
+		scanf("%d", &biblioteca[i].NumarPagini);
+	}
+}
+
+void ScriereInFisier(FILE* fp, struct carte* biblioteca, int n) {
+	fprintf(fp, "Cartile care au mai mult de 100 de pagini sunt: \n");
+	for (int i = 0; i < n; i++) {
+		if (biblioteca[i].NumarPagini > 100) {
+			fprintf(fp, "\n"); // Introduce un rand liber la fiecare scriere in fisier.txt
+			fprintf(fp, "	Cartea %d\n", i + 1);
+			fprintf(fp, "Autor: %s\n", biblioteca[i].autor);
+			fprintf(fp, "Titlu carte: %s\n", biblioteca[i].titlu);
+			fprintf(fp, "Numar de pagini: %d\n", biblioteca[i].NumarPagini);
+		}
+	}
+}
