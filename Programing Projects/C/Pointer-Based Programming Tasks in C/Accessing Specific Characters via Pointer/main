@@ -13,7 +13,6 @@ int main() {
         printf("Sirul are nevoie de minim 7 caractere");
         return 0;
     }
-
     char* ptr = str;
     printf("Caracterele de pe pozitiile 1, 3, 5, 7 sunt: %c, %c, %c, %c\n", ptr[0], ptr[2], ptr[4], ptr[6]);
 
