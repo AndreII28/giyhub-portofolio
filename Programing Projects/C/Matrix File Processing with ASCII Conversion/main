@@ -1,0 +1,161 @@
+/*
+The elements of an N x N matrix containing integers are stored in a text file.
+Read the matrix from the file.
+Dynamically allocate memory for it.
+Check that the elements are positive numbers between 65 and 90 (inclusive) or equal to 32.
+Calculate and display the sum of the elements located at positions where i + j is odd.
+Display a message if any row or column contains only 32s.
+Write to another file the resulting matrix in which the secondary diagonal elements are replaced with their corresponding ASCII characters.
+*/
+
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+
+//Antet functii
+void citirematrice(FILE*, int**,int);
+void afisare(int**,int);
+void verificare(int**,int);
+void suma(int**, int);
+void egalcu32(int**, int);
+void scrierematrice(FILE*, int**, int);
+
+int main() {
+	int i, j;
+	//creare pointeri la diferite fisiere
+	FILE* fp;
+	char nume_fisier[] = "D:\\PregatireExamenC\\Matrice.txt";
+	fp = fopen(nume_fisier, "r");//citire fisier 
+	int** mat1; // pointer dublu pentru matrici
+	FILE* ASCII;
+	char nume_fisier_nou[] = "D:\\PregatireExamenC\\MatriceCeContineCodulASCII.txt";
+	ASCII = fopen(nume_fisier_nou, "w+"); // creare si scriere fisier + citirea lui
+
+	int n;
+	fscanf(fp, "%d", &n);
+	printf("%d\n", n);
+
+	// alocarea dinamica pentru matrice 1
+	if ((mat1 = (int**)malloc(n * sizeof(int)))) {
+		for (i = 0; i < n; i++) {
+			mat1[i] = (int*)malloc(n * sizeof(int));
+			if (mat1[i] == 0) {
+				printf("\nEroare de alocare !");
+				return 0;
+			}
+		}
+	}
+
+	//Apelare functii
+	citirematrice(fp, mat1, n);
+	verificare(mat1, n);
+	afisare(mat1, n);
+	suma(mat1, n);
+	egalcu32(mat1, n);
+	scrierematrice(ASCII, mat1, n);
+
+	// Dealocare
+	if (mat1) {
+		for (i = 0; i < n; i++)
+			free(mat1[i]);
+		free(mat1);
+	}
+}
+// Functie de citire a fisierului
+void citirematrice(FILE* fp, int** mat1, int n) {
+	int i, j;
+	for (i = 0; i < n; i++) {
+		for (j = 0; j < n; j++) {
+			fscanf(fp, "%i", &mat1[i][j]);
+		}
+
+	}
+}
+// Functie de afisare a matrici
+void afisare(int** mat1, int n) {
+	int i, j;
+	for (i = 0; i < n; i++) {
+		for (j = 0; j < n; j++) {
+			printf(" %d ", mat1[i][j]);
+		}
+		printf("\n");
+
+	}
+}
+// Functie de vreificare a matrici daca elementele se incareaza in parametri
+void verificare(int** mat1, int n) {
+	int i, j;
+	for (i = 0; i < n; i++) {
+		for (j = 0; j < n; j++) {
+			if (!((mat1[i][j] >= 65) && (mat1[i][j] <= 90)) ^ (mat1[i][j] == 32)) {
+				printf("Elementele matrici sunt diferite de ....\n");
+				exit(0);
+			}
+		}
+
+	}
+}
+// Functie de calcul a elementelor de pe poziti impare
+void suma(int** mat1, int n) {
+	int i, j, sum = 0;
+	for (i = 0; i < n; i++) {
+		for (j = 0; j < n; j++) {
+			if ((i + j) % 2 != 0)
+				sum += mat1[i][j];
+		}
+	}
+	printf("Suma elementelor de pe poziti impare: %d\n", sum);
+}
+
+// Functie de verificare daca matricea are lini sau coloane complete cu 32
+void egalcu32(int** mat1, int n) {
+	printf("\n");
+	printf("\n");
+
+	// Verificăm linii
+	for (int i = 0; i < n; i++) {
+		int linie_egala_cu_32 = 1; // Presupunem că linia este egală cu 32
+		for (int j = 0; j < n; j++) {
+			if (mat1[i][j] != 32) {
+				linie_egala_cu_32 = 0; // Dacă găsim un element diferit de 32, resetăm indicatorul
+				break; // Putem ieși din buclă pentru că nu mai avem nevoie să verificăm restul elementelor
+			}
+		}
+		if (linie_egala_cu_32) {
+			printf("Randul %d contine doar elemente egale cu 32\n", i + 1);
+		}
+	}
+
+	// Verificăm coloane
+	for (int j = 0; j < n; j++) {
+		int coloana_egala_cu_32 = 1; // Presupunem că coloana este egală cu 32
+		for (int i = 0; i < n; i++) {
+			if (mat1[i][j] != 32) {
+				coloana_egala_cu_32 = 0; // Dacă găsim un element diferit de 32, resetăm indicatorul
+				break; // Putem ieși din buclă pentru că nu mai avem nevoie să verificăm restul elementelor
+			}
+		}
+		if (coloana_egala_cu_32) {
+			printf("Coloana %d contine doar elemente egale cu 32\n", j + 1);
+		}
+	}
+
+	printf("\n");
+	printf("\n");
+}
+
+// Functie de scriere a matrici in fiser inlocuind elementele de pe diagonala secundara
+void scrierematrice(FILE* ASCII, int** mat1, int n) {
+	int i, j;
+	for (i = 0; i < n; i++) { 
+		for (j = 0; j < n; j++) {
+			if (i + j == n - 1) { // Conditia de verificare daca elementul se afla pe diagonala secundara
+				fprintf(ASCII, "%c ", mat1[i][j]);
+			}
+			else {
+				fprintf(ASCII, "%d ", mat1[i][j]);
+			}
+		}
+		fprintf(ASCII, "\n");
+	}
+}
