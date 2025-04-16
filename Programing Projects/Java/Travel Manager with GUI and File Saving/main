@@ -1,0 +1,157 @@
+/*
+Define the class Calatorie with the protected fields destination and price (double), and include a parameterized constructor to initialize the data, along with getters and setters.
+The class Voiaj inherits from Calatorie and adds a accommodation field (double), an appropriate constructor, getter/setter, the method tripPrice, and overrides the toString() method to return all information about an object.
+The application includes a GUI based on Frame, with: one TextField, two buttons (Write and Save), a TextArea (TA), and a Label.
+In the text input field, users can enter a destination and two prices separated by space. (In case of invalid input, appropriate error messages are displayed in the label.)
+When the Write button is pressed, the information from the input field is used to create a Voiaj object, which is displayed in the TextArea and added to a list.
+When the Save button is pressed, the list is iterated through and the objects are written to a file.
+*/
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+class Calatorie {
+    protected String destinatie;
+    protected double pret;
+
+    public Calatorie(String destinatie, double pret) {
+        this.destinatie = destinatie;
+        this.pret = pret;
+    }
+
+    public String getDestinatie() {
+        return destinatie;
+    }
+
+    public void setDestinatie(String destinatie) {
+        this.destinatie = destinatie;
+    }
+
+    public double getPret() {
+        return pret;
+    }
+
+    public void setPret(double pret) {
+        this.pret = pret;
+    }
+}
+
+class Voiaj extends Calatorie {
+    private double cazare;
+
+    public Voiaj(String destinatie, double pret, double cazare) {
+        super(destinatie, pret);
+        this.cazare = cazare;
+    }
+
+    public double getCazare() {
+        return cazare;
+    }
+
+    public void setCazare(double cazare) {
+        this.cazare = cazare;
+    }
+
+    public double pretVoiaj() {
+        return pret + cazare;
+    }
+
+    @Override
+    public String toString() {
+        return "Destinatie: " + destinatie + ", Pret: " + pret + ", Cazare: " + cazare + ", Pret total: " + pretVoiaj();
+    }
+}
+
+public class VoiajApp {
+    private JFrame frame;
+    private JTextField textField;
+    private JButton scrieButton;
+    private JButton saveButton;
+    private JTextArea textArea;
+    private JLabel label;
+    private List<Voiaj> voiajList = new ArrayList<>();
+
+    public static void main(String[] args) {
+        VoiajApp app = new VoiajApp();
+        app.createGUI();
+    }
+
+    public void createGUI() {
+        frame = new JFrame("Voiaj App");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(600, 400);
+
+        textField = new JTextField(30);
+        scrieButton = new JButton("Scrie");
+        saveButton = new JButton("Save");
+        textArea = new JTextArea(10, 50);
+        textArea.setEditable(false);
+        label = new JLabel();
+
+        scrieButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                scrieVoiaj();
+            }
+        });
+
+        saveButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveVoiaje();
+            }
+        });
+
+        JPanel panel = new JPanel();
+        panel.add(textField);
+        panel.add(scrieButton);
+        panel.add(saveButton);
+        panel.add(label);
+
+        frame.add(panel, BorderLayout.NORTH);
+        frame.add(new JScrollPane(textArea), BorderLayout.CENTER);
+
+        frame.setVisible(true);
+    }
+
+    private void scrieVoiaj() {
+        String input = textField.getText();
+        String[] parts = input.split("\\s+");
+
+        if (parts.length != 3) {
+            label.setText("Introduceți o destinație și două preturi separate prin spațiu.");
+            return;
+        }
+
+        try {
+            String destinatie = parts[0];
+            double pret = Double.parseDouble(parts[1]);
+            double cazare = Double.parseDouble(parts[2]);
+
+            Voiaj voiaj = new Voiaj(destinatie, pret, cazare);
+            voiajList.add(voiaj);
+            textArea.append(voiaj.toString() + "\n");
+            label.setText("");
+        } catch (NumberFormatException e) {
+            label.setText("Introduceți doar numere pentru preturi.");
+        }
+    }
+
+    private void saveVoiaje() {
+        try (FileWriter writer = new FileWriter("D:\\Facultate\\An 2\\Semestrul 2\\--- Inginerie software JAVA\\Examen\\Documentatie\\Calatorie\\voiaje.txt")) {
+            for (Voiaj v : voiajList) {
+                writer.write(v.toString() + "\n");
+            }
+            label.setText("Voiajele au fost salvate în fișier.");
+        } catch (IOException e) {
+            label.setText("Eroare la salvarea fișierului.");
+            e.printStackTrace();
+        }
+    }
+}
