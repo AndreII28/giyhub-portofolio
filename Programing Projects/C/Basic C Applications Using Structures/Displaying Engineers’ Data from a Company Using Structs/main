@@ -1,0 +1,81 @@
+/*
+Write a C application that uses a structure of type employee to display all the information of the people with the occupation "engineer" in a company 
+(fields: name, surname, occupation, birth date, department). You can perform any operation inside the relevant function with appropriate messages.
+*/
+
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define MAX 20
+
+struct angajat
+{
+	char nume[30];
+	char prenume[30];
+	char ocupatie[30];
+	char DataNasteri[11];
+	char sectie[15];
+};
+
+void Angajati(struct angajat* s);
+void AfisareAngajati(struct angajat* s);
+
+int main() {
+	struct angajat* s;
+	int i, n, contor = 0, inscrieri = 0;
+	printf("\nNumar de angajati : ");
+	scanf("%d", &n);
+	if (n <= 0 || n > MAX) {
+		printf("\n Numar invalid (negativ) !\n");
+		return 0;
+	}
+
+	if (!(s = (struct angajat*)malloc(n * sizeof(struct angajat)))) {
+		printf("Alocare nereussita!");
+		return 0;
+	}
+
+	printf("\n Introduceti datele angajatilor :\n");
+
+	for (i = 0; i < n; i++) {
+		printf("\nAngajatul %d", i + 1);
+		Angajati(s + i);
+	}
+
+	printf("\n Angajati cu ocupatie inginer: \n");
+	for (i = 0; i < n; i++) {
+		if (strcmp((s + i)->ocupatie, "Inginer") == 0) {
+			contor++;
+			printf("\nAngajat %d:", i + 1);
+			AfisareAngajati(s + i);
+		}
+	}
+	printf("Numarul de angajati cu ocupatie inginer este %d\n", contor);
+	// Eliberăm memoria alocată
+	free(s);
+
+}
+void Angajati(struct angajat* s) {
+	printf("\nNumele: ");
+	scanf("%s", s->nume);
+	printf("\nPrenume: ");
+	scanf("%s", s->prenume);
+	printf("\nOcupatie: ");
+	scanf("%s", s->ocupatie);
+	printf("\nDataNasteri cu format (mm/dd/yyyy): ");
+	scanf("%s", s->DataNasteri);
+	printf("\nSectie: ");
+	scanf("%s", s->sectie);
+}
+
+void AfisareAngajati(struct angajat* s) {
+	//printf("\n");
+	printf("\nNumele: %s", s->nume);
+	printf("\nPrenume: %s", s->prenume);
+	printf("\nOcupatie: %s", s->ocupatie);
+	printf("\nDataNasteri: %s", s->DataNasteri);
+	printf("\nSectie: %s", s->sectie);
+	printf("\n");
+}
+
