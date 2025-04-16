@@ -1,0 +1,38 @@
+/*
+Write a program that reads float values from the keyboard representing student averages. Use a function with pointers to determine 
+how many students have an average >= 8. Display the result in main(). Avoid global variables.
+*/
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#define MAX 20
+
+// Definirea funcției care numără studenții cu media >= 8
+int numaraStudentiCuMedieMare(float* medii, int numarStudenti) {
+    int contor = 0;
+    for (int i = 0; i < numarStudenti; i++) {
+        if (medii[i] >= 8.0) {
+            contor++;
+        }
+    }
+    return contor;
+}
+
+int main() {
+    int numarStudenti;
+    printf("Introduceti numarul de studenti: ");
+    scanf("%d", &numarStudenti);
+
+    float medii[MAX]; 
+
+    for (int i = 0; i < numarStudenti; i++) {
+        printf("Media studentului %d: ", i + 1);
+        scanf("%f", &medii[i]);
+    }
+
+    
+    int studentiDeSucces = numaraStudentiCuMedieMare(medii, numarStudenti);
+    
+    printf("Numarul de studenti cu media mai mare sau egala cu 8 sau mai mult este: %d\n", studentiDeSucces);
+    
+    return 0;
+}
