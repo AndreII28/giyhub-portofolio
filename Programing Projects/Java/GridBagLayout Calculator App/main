@@ -1,0 +1,135 @@
+/*
+Implement a Java application that uses GridBagLayout to arrange the components of a calculator application (a TextField for input/output, buttons for numbers, mathematical operations, screen clearing, etc.).
+*/
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+class MyFrame1 extends Frame {
+    private CalcEcran display;
+    private CalcPanel panel;
+
+    MyFrame1(String s) {
+        super(s);
+        setLayout(new BorderLayout());
+        this.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent we) {
+                System.exit(0);
+            }
+        });
+
+        display = new CalcEcran();
+        add(display, BorderLayout.NORTH);
+
+        panel = new CalcPanel(display);
+        add(panel, BorderLayout.CENTER);
+
+        setSize(400, 500);
+        setVisible(true);
+    }
+}
+
+class CalcEcran extends TextField {
+    public CalcEcran() {
+        super();
+        setEditable(false);
+        setFont(new Font("Arial", Font.PLAIN, 24));
+    }
+}
+
+class CalcPanel extends Panel {
+    public CalcPanel(CalcEcran display) {
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+
+        String[] buttons = {
+            "7", "8", "9", "/",
+            "4", "5", "6", "*",
+            "1", "2", "3", "-",
+            "C", "0", "=", "+"
+        };
+
+        int gridx = 0, gridy = 0;
+        for (String text : buttons) {
+            Button buton = new Button(text);
+            buton.addActionListener(new CalcButon(display));
+            gbc.gridx = gridx;
+            gbc.gridy = gridy;
+            add(buton, gbc);
+
+            gridx++;
+            if (gridx > 3) {
+                gridx = 0;
+                gridy++;
+            }
+        }
+    }
+}
+
+class CalcButon implements ActionListener {
+    private CalcEcran display;
+
+    public CalcButon(CalcEcran display) {
+        this.display = display;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String command = e.getActionCommand();
+        if (command.equals("C")) {
+            display.setText("");
+        } else if (command.equals("=")) {
+            try {
+                display.setText(evaluate(display.getText()));
+            } catch (Exception ex) {
+                display.setText("Error");
+            }
+        } else {
+            display.setText(display.getText() + command);
+        }
+    }
+
+    private String evaluate(String expression) {
+        char[] arr = expression.toCharArray();
+        String operand1 = "";
+        String operand2 = "";
+        String operator = "";
+        double result = 0;
+
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i] >= '0' && arr[i] <= '9' || arr[i] == '.') {
+                if (operator.isEmpty()) {
+                    operand1 += arr[i];
+                } else {
+                    operand2 += arr[i];
+                }
+            }
+
+            if (arr[i] == '+' || arr[i] == '-' || arr[i] == '/' || arr[i] == '*') {
+                operator += arr[i];
+            }
+        }
+
+        if (operator.equals("+"))
+            result = (Double.parseDouble(operand1) + Double.parseDouble(operand2));
+        else if (operator.equals("-"))
+            result = (Double.parseDouble(operand1) - Double.parseDouble(operand2));
+        else if (operator.equals("/"))
+            result = (Double.parseDouble(operand1) / Double.parseDouble(operand2));
+        else
+            result = (Double.parseDouble(operand1) * Double.parseDouble(operand2));          
+        return String.valueOf(result);
+    }
+}
+
+public class Problema_22 {
+    public static void main(String[] args) {
+        new MyFrame1("Calculator");
+    }
+}
