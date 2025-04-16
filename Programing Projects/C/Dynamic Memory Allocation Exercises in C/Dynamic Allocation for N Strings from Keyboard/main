@@ -1,4 +1,4 @@
-/* RebelesAndrei_2521_lab11_nr.prob4
+/* 
 Write a C application that dynamically allocates memory for n strings, which will be entered from the keyboard.
 --------------------------------------------------------------------------------------------------*/
 #define _CRT_SECURE_NO_WARNINGS
