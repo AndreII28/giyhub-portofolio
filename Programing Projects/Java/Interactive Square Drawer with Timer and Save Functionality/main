@@ -1,0 +1,298 @@
+/*
+Create a Java Swing application that allows users to draw squares on a panel by entering the X and Y coordinates and the side length R. The application validates that the square fits within the drawing area.
+Upon clicking the "Afiseaza" (Display) button:
+A square is drawn on the drawingPanel at the specified coordinates.
+Its area is calculated and displayed in the areaTextArea.
+A timer is reset and starts counting the seconds since the last operation, updating in real-time in the timerTextArea.
+Errors like invalid input or drawing outside bounds are caught and displayed in the label.
+Upon clicking the "Salveaza" (Save) button:
+The content of the areaTextArea (i.e., all recorded areas) is saved to a uniquely named text file (output_1.txt, output_2.txt, etc.).
+A confirmation message is shown, or an error is displayed if saving fails.
+*/
+
+import javax.swing.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.Random;
+
+import javax.swing.*;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+class FileUtil {
+    // un intreg care retine la al catelea saveFile operation suntem (al catelea fisier il salvam)
+    private static int fileCount = 0;
+
+    // metoda saveToFile se apeleaza NUMAI SI NUMAI cand butonul "Salveaza" este apasat
+    // parametrul "content" este continutul "areaTextArea"
+    public static void saveToFile(String content) throws IOException {
+        // Crestem index-ul fisierului curent
+        fileCount++;
+        // folosim clasa Path pentru a ne forma numele fisierului dupa bunul plac
+        Path path = Paths.get("output_" + fileCount + ".txt");
+
+        // Folosim BufferedWriter pentru a new scrie in fisier (citit/video/laburi)
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(path.toFile()))) {
+            writer.write(content);
+        }
+    }
+}
+
+//Numele clasei
+class TimerUtil {
+ // "timerTextArea" este JTextArea-ul (adica campul de text) unde se va scrie timpul trecut intre operatiuni
+ private JTextArea timerTextArea;
+ // "timer" este Timer-ul (adica java.util.Timer, ala de Thread) folosit pentru masurarea timpului
+ // Citeste pe oracle docs despre java.util.Timer, sau uita-te pe youtube la explicatii
+ private Timer timer;
+ // System.currentTimeMillis() se masoara in milisecunde
+ private long startTime;
+
+ public TimerUtil(JTextArea timerTextArea) {
+     this.timerTextArea = timerTextArea;
+ }
+
+ // timer-ul se reseteaza la fiecare apasare a butonului "Afiseaza"
+ public void resetTimer() {
+     // Daca exista un timer activ, il dezactivam
+     if(timer != null) {
+         timer.cancel();
+     }
+
+     // Inregistram momentul exact cand s-a resetat timer-ul
+     startTime = System.currentTimeMillis();
+     // resetam textArea-ul in care afisam secundele trecute de la ultima operatie
+     timerTextArea.setText("");
+
+     // cream un timer nou
+     timer = new Timer();
+     // ii dam timer-ului sa afiseze la fiecare secunda cat timp a trecut
+     timer.scheduleAtFixedRate(new TimerTask() {
+         @Override
+         public void run() {
+             // aici convertim timpul curent minus timpul ultimei resetari din milisecunde in secunde
+             long elapsed = (System.currentTimeMillis() - startTime) / 1000;
+             // afisam in textArea cat timp a trecut de la ultima resetare
+             SwingUtilities.invokeLater(() -> timerTextArea.append("Elapsed time: " + elapsed + " seconds\n"));
+         }
+         // afisarea de mai sus incepe cu 1 secunda delay si se face o data la fiecare secunda
+     }, 1000, 1000);
+ }
+}
+
+// extends JFrame, adica foloseste toate metodele pe care le stie JFrame
+// JFrame e clasa parinte a lui GUI
+class GUI extends JFrame {
+    // obiecte de tip JTextField pentru X, Y si R
+    // JTextField inseamna ca e ca un textbox cu o singura linie, si se extinde dupa caz
+    private JTextField xTextField, yTextField, rTextField;
+
+    // obiecte de tip JTextArea pentru ARIE si TIMER
+    // JTextArea inseamna ca ai o suprafata mare care se va popula cu text
+    private JTextArea areaTextArea, timerTextArea;
+
+    // Label pentru "error". Label este un text acolo, pus pe aplicatie
+    private JLabel errorLabel;
+
+    // Acest JPanel, numit "drawingPanel" este zona in care se vor desena patratele
+    // Coordonatele [X,Y] se masoara in raport cu acest JPanel
+    private JPanel drawingPanel;
+
+    // un obiect de tip TimerUtil, care ne ajuta sa aducem in clasa de GUI metodele declarate in clasa TimerUtil
+    private TimerUtil timerUtil;
+
+    // Un contor care stocheaza la al cate-lea patrat suntem
+    private int squareCount = 0;
+
+    public GUI() {
+        // Aici punem numele aplicatiei (MUSAI)
+        setTitle("Square Drawer");
+        // Dimensiunea de baza a ferestrei (poate fi modificata ulterior)
+        setSize(800, 600);
+        // EXIT_ON_CLOSE face sa se inchida aplicatia cand dai X
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // Asta te ajuta sa iti imparti fereastra in zone marginite (Borders). Rec. google/youtube pe tema asta
+        setLayout(new BorderLayout());
+
+        // "inputPanel" este o structura parinte ce contine toate chestiile ce tine de interactiunea cu omul
+        // adica butoane, textfields, labels s.a.m.d.
+        // in "inputPanel" ne adaugam toate chestiile cu care interactionam
+        JPanel inputPanel = new JPanel(new GridLayout(6, 1));
+        // apelanda createInputField, adaugam x/y/r-TextFields in inputPanel si le setam un label corespunzator
+        xTextField = createInputField(inputPanel, "X: ");
+        yTextField = createInputField(inputPanel, "Y: ");
+        rTextField = createInputField(inputPanel, "R: ");
+
+        // Aici setam empty string la "errorLabel" si il punem in inputPanel
+        errorLabel = new JLabel("");
+        inputPanel.add(errorLabel);
+
+        // Aici cream butoanele de "Afiseaza" si "Salveaza", le setam textul de pe ele
+        // Le atasam la fiecare cate o clasa speciala de ActionListener,
+        // adica DisplayButtonListener si SaveButtonListener
+        // Aceste doua clase contin exact operatiile speciale ce se vor intampla
+        // cand butoanele sunt apasate
+        JPanel buttonPanel = new JPanel();
+        JButton displayButton = new JButton("Afiseaza");
+        JButton saveButton = new JButton("Salveaza");
+        displayButton.addActionListener(new DisplayButtonListener());
+        saveButton.addActionListener(new SaveButtonListener());
+
+        // adaugam cele doua butoane ale noastre de tip JButton in buttonPanel
+        buttonPanel.add(displayButton);
+        buttonPanel.add(saveButton);
+
+        // adaugam buttonPanel in inputPanel (sa fie ordonate)
+        inputPanel.add(buttonPanel);
+
+        // lipim inputPanel de stanga (vestul) ferestrei aplicatiei
+        add(inputPanel, BorderLayout.WEST);
+
+        // Cream zona de desenare, numita "drawingPanel", de tip JPanel
+        drawingPanel = new JPanel() {
+            // dam Override la JComponent.paintComponent(Graphics g)
+            // insa nu adaugam niciun cod extra, ca nu ne trebuie
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+            }
+        };
+        // setam dimensiunea zonei de desenare (se poate modifica cu mouse-ul)
+        drawingPanel.setPreferredSize(new Dimension(400, 400));
+        // setam background color la zona de desenare
+        drawingPanel.setBackground(Color.WHITE);
+        // lipim zona de desenare ("drawingPanel") de centrul ferestrei aplicatiei
+        add(drawingPanel, BorderLayout.CENTER);
+
+        // Cream "areaTextArea", bucata mare de interfata in care se vor scrie ariile
+        areaTextArea = new JTextArea();
+        // setEditable(false) inseamna ca utilizatorul nu poate sa scrie in areaTextArea
+        areaTextArea.setEditable(false);
+        // mutam "areaTextArea" in "areaScrollPane", un obiect de tip JScrollPane care ne permite sa dam scroll
+        // la continut daca textul ne depaseste dimensiunile interfetei
+        JScrollPane areaScrollPane = new JScrollPane(areaTextArea);
+        // lipim "areaScrollPane" de dreapta (estul) ferestrei aplicatiei
+        add(areaScrollPane, BorderLayout.EAST);
+
+        // Aceeasi chestie ca la "areaTextArea"
+        timerTextArea = new JTextArea();
+        timerTextArea.setEditable(false);
+        JScrollPane timerScrollPane = new JScrollPane(timerTextArea);
+        add(timerScrollPane, BorderLayout.SOUTH);
+
+        // cream obiectul "timerUtil", ce ne va permite sa masuram durate in clasa GUI
+        // ii asociem acestui obiect "timerUtil" pe "timerTextArea"
+        timerUtil = new TimerUtil(timerTextArea);
+    }
+
+    // In metoda createInputField avem parametri:
+    // - "panel": JPanel-ul din care textField-ul va face parte
+    // - "label": eticheta asociata cu textField-ul
+    private JTextField createInputField(JPanel panel, String label) {
+        JLabel jLabel = new JLabel(label);
+        JTextField textField = new JTextField();
+        // adaugam in "panel" (in cazul nostru, "inputPanel") atat labelul, cat si textField-ul
+        panel.add(jLabel);
+        panel.add(textField);
+        return textField;
+    }
+
+    // in main apelam metoda asta pentru a face vizibila interfata
+    public void createAndShowGUI() {
+        setVisible(true);
+    }
+
+// clasa de ActionListener pentru butonul "Afiseaza"
+// implementam interfata "ActionListener", care contine metoda "actionPerformed(ActionEvent e)
+// astfel, putem sa adaugam operatiile noastre specifice la event-ul de click pe buton
+class DisplayButtonListener implements ActionListener {
+    // dam override la metoda din interfata ActionListener
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        try {
+            // preluam si convertim la int/float textele din x/y/r-TextField-uri
+            int x = Integer.parseInt(xTextField.getText());
+            int y = Integer.parseInt(yTextField.getText());
+            float r = Float.parseFloat(rTextField.getText());
+
+            // Daca patratul depaseste zona de desenare
+            if (x < 0 || x + r > drawingPanel.getWidth() || y < 0 || y + r > drawingPanel.getHeight()) {
+                // aruncam exceptia gestionata mai jos
+                throw new Exception("Depasire zona de desenare!");
+            }
+
+            // daca nu avem eroare, inseamna ca patratul e desenat, si crestem contorul
+            squareCount++;
+            // cream un obiect de tip Square, folosind constructorul nostru Square(x, y, r)
+            Square newSquare = new Square(x, y, r);
+
+            // folosim metoda Square.getArea() pentru a afisa in "areaTextArea" suprafata noului patrat
+            areaTextArea.append(String.format("Area of square #%d: %.2f\n", squareCount, newSquare.getArea()));
+
+            // cream un obiect de tip Graphics in "drawingPanel"
+            Graphics g = drawingPanel.getGraphics();
+            // setam culoarea obiectului de tip Graphics
+            // culoarea (care se scrie ca hexcode 0x??????) ia numere random de la 0x000000 pana la 0xFFFFFF)
+            // Citeste despre hexcode in RGB colors pe net
+            g.setColor(new Color(new Random().nextInt(0xFFFFFF)));
+            // apelam g.fillRect pentru a desena un dreptunghi la originile [x, y], de latime r si inaltime r
+            // latimea si inaltimea sunt intregi, deci faci casting: (int) val [CITESTE TYPE CASTING PE NET]
+            g.fillRect(x, y, (int) r, (int) r);
+
+            // resetam errorLabel
+            errorLabel.setText("");
+
+            // resetam timer-ul, pentru ca am apasat pe butonul de "Afiseaza"
+            timerUtil.resetTimer();
+
+            // Eroare de input (adica nu sunt numere)
+        } catch (NumberFormatException ex) {
+            errorLabel.setText("Invalid input");
+
+            // Eroarea de mai sus, ca se depaseste zona de desenare
+        } catch (Exception ex) {
+            errorLabel.setText(ex.getMessage());
+        }
+    }
+}
+
+// clasa de ActionListener pentru butonul "Salveaza"
+// implementam interfata "ActionListener", care contine metoda "actionPerformed(ActionEvent e)
+// astfel, putem sa adaugam operatiile noastre specifice la event-ul de click pe buton
+class SaveButtonListener implements ActionListener {
+    // dam override la metoda din interfata ActionListener
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        try {
+            // Folosim clasa noastra, numita FileUtil, pentru a salva textul din "areaTextArea" intr-un fisier
+            FileUtil.saveToFile(areaTextArea.getText());
+            // Afisam un mesaj ca s-a salvat OK
+            errorLabel.setText("File saved successfully");
+
+            // Daca doamne-fereste nu merge, afisam eroare
+        } catch (IOException ex) {
+            errorLabel.setText("Error saving file");
+        }
+    }
+}
+}
+
+public class SquareDrawerApp
+{
+    public static void main( String[] args ) {
+        // Citeste in documentatia oracle sau pe google cum se foloseste "SwingUtilities.invokeLater lamba method"
+        SwingUtilities.invokeLater(() -> {
+            GUI gui = new GUI();
+            gui.createAndShowGUI();
+        });
+    }
+}
