@@ -1,0 +1,66 @@
+/* RebelesAndrei_2521_lab11_nr.prob2
+Create a program for a distributed management application tracking activity in 5 cities. Each city has 3 sales offices. Inside a function, create an array of 5 float pointers,
+each pointing to dynamically allocated memory with 3 float values representing daily sales. Include:
+A function to input data for all 5 cities and their 3 shops.
+A function to calculate the total sales for each city and return it, so the average sales across all cities can be displayed in the main function.
+A function to free the dynamically allocated memory, allowing the system to be reused later for new data.
+--------------------------------------------------------------------------------------------------*/
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+
+void introducereDate(float** vanzari, int orase, int birouri);
+float calculTotalOras(float* vanzariOras, int birouri);
+void eliberareMemorie(float** vanzari, int orase);
+
+int main() {
+    const int orase = 5;
+    const int birouri = 3;
+    float* vanzari[orase];
+
+    // Alocare memorie
+    for (int i = 0; i < orase; i++) {
+        vanzari[i] = (float*)malloc(birouri * sizeof(float));
+    }
+
+    // Introducere date
+    introducereDate(vanzari, orase, birouri);
+
+    // Calcul și afișare totaluri și medie vânzări
+    float totalVanzari = 0;
+    for (int i = 0; i < orase; i++) {
+        float totalOras = calculTotalOras(vanzari[i], birouri);
+        printf("Total vanzari oras %d: %.2f\n", i + 1, totalOras);
+        totalVanzari += totalOras;
+    }
+    printf("Media vanzarilor din toate orasele: %.2f\n", totalVanzari / orase);
+
+    // Eliberare memorie
+    eliberareMemorie(vanzari, orase);
+
+    return 0;
+}
+
+void introducereDate(float** vanzari, int orase, int birouri) {
+    for (int i = 0; i < orase; i++) {
+        printf("Introduceti vanzarile pentru orasul %d:\n", i + 1);
+        for (int j = 0; j < birouri; j++) {
+            printf("Biroul %d: ", j + 1);
+            scanf("%f", &vanzari[i][j]);
+        }
+    }
+}
+
+float calculTotalOras(float* vanzariOras, int birouri) {
+    float total = 0;
+    for (int i = 0; i < birouri; i++) {
+        total += vanzariOras[i];
+    }
+    return total;
+}
+
+void eliberareMemorie(float** vanzari, int orase) {
+    for (int i = 0; i < orase; i++) {
+        free(vanzari[i]);
+    }
+}
