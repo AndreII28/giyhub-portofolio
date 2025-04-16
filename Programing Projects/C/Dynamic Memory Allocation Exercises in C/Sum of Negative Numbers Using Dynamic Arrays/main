@@ -1,0 +1,35 @@
+/* RebelesAndrei_2521_lab11_nr.prob1
+Write a program that reads n real numbers, stores them in a dynamically allocated array, calculates and displays the sum of the negative numbers, and finally frees the allocated memory.
+--------------------------------------------------------------------------------------------------*/
+#define _CRT_SECURE_NO_WARNINGS
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+	int n;
+	printf("Cate numere contine sirul: ");
+	scanf("%d", &n);
+
+	double* numere = (double*)malloc(n * sizeof(double));
+	if (numere == NULL) {
+		printf("Eroare la alocarea memoriei.\n");
+		return 1;
+	}
+
+	printf("Introduceti %d numere reale: ", n);
+	for (int i = 0; i < n; i++) {
+		scanf("%lf", &numere[i]);
+	}
+
+	float SumaNegativa = 0.0;
+	for (int i = 0; i < n; i++) {
+		if (numere[i] < 0) {
+			SumaNegativa += numere[i];
+		}
+	}
+
+	printf("Suma numerelor negative este %.2lf\n", SumaNegativa);
+
+	free(numere);
+	return 0;
+}
